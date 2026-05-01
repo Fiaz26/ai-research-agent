@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: ai-research-agent
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false        # You will paste this in the Render dashboard
+      - key: GEMINI_API_KEY
+        sync: false        # You will paste this in the Render dashboard
+      - key: SESSION_SECRET
+        generateValue: true

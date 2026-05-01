@@ -1,0 +1,14 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "eW-w-i6mukxgnLtOnmqWO"
+uri = "file://exports/ai-research-agent.tar.gz"
+type = "unspecified"
+title = "AI Research Agent — Full Project Source"
+
+[[outputs]]
+id = "1dDHNBC_BycD2JMe4IBpp"
+uri = "file://exports/ai-research-agent.zip"
+type = "unspecified"
+title = "AI Research Agent — Multi-Platform Deploy Package (.zip)"

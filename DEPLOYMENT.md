@@ -1,129 +1,138 @@
 # AI Research Agent — Deployment Guide
 
-This app runs on **Node.js** with a **PostgreSQL** database.  
-It works on Render, Railway, Fly.io, and any Node.js-compatible host.
+This app runs on **Node.js** with a **PostgreSQL** database.
+Works on Glitch, Render, Railway, Fly.io, and any Node.js host.
 
 ---
 
-## Before you start — get your free keys
+## Before you start — get your two free keys
 
-You need two things regardless of which host you choose:
+### 1. Free PostgreSQL database (Neon.tech) — no card needed
+1. Go to **neon.tech** → sign up free (email only, no card).
+2. Click **Create Project**, give it any name.
+3. Go to **Dashboard → Connection Details** and copy the connection string:
+   ```
+   postgresql://user:password@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
+   ```
+4. Save it — you'll paste it as `DATABASE_URL` on your chosen host.
 
-### 1. Free PostgreSQL database (Neon.tech)
-1. Go to [neon.tech](https://neon.tech) and sign up (free, no credit card).
-2. Create a new project.
-3. Copy the **Connection String** — it looks like:  
-   `postgresql://user:password@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require`
-
-### 2. Free AI key (Google Gemini — recommended)
-1. Go to [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey).
-2. Sign in with your Google account.
-3. Click **Create API Key** and copy it.
-
-> Alternatively use an **OpenAI API key** from [platform.openai.com](https://platform.openai.com) (paid, but cheap for low traffic).
+### 2. Free AI key (Google Gemini) — no card needed
+1. Go to **aistudio.google.com/app/apikey** (sign in with Google).
+2. Click **Create API Key** and copy it.
+3. Save it — you'll paste it as `GEMINI_API_KEY` on your chosen host.
 
 ---
 
-## Option A — Render.com (easiest, truly free)
+## OPTION 1 — Glitch.com (Free, No Credit Card, Easiest)
 
-1. Push this project to a **GitHub** repository (free at github.com).
-2. Go to [render.com](https://render.com) and sign up.
-3. Click **New → Web Service** and connect your GitHub repo.
-4. Render auto-detects `render.yaml`. Confirm the settings:
+### Step 1 — Sign up
+- Go to **glitch.com** → click **Sign In** → sign in with your **GitHub** account.
+
+### Step 2 — Import your repo
+- Click **New Project** (top right) → **Import from GitHub**.
+- Enter: `Fiaz26/ai-research-agent`
+- Click **OK**. Glitch copies all your files.
+
+### Step 3 — Change the start script (one line, 30 seconds)
+- In the Glitch file editor (left panel), click on **`package.json`**.
+- Find this line:
+  ```json
+  "start": "NODE_ENV=production node dist/index.cjs",
+  ```
+- Change it to:
+  ```json
+  "start": "node glitch-start.js",
+  ```
+- Glitch saves automatically.
+- This tells Glitch to use the included `glitch-start.js` which auto-builds the
+  app on first launch, then starts the server. You never need to run a build command manually.
+
+### Step 4 — Add environment variables
+- In the Glitch left panel, click the **`.env`** file (Glitch keeps this private).
+- Add these lines (replace the values with your own):
+  ```
+  DATABASE_URL=postgresql://user:password@host/dbname
+  GEMINI_API_KEY=your-gemini-api-key
+  SESSION_SECRET=any-long-random-string-like-this-abc123xyz
+  NODE_ENV=production
+  ```
+
+### Step 5 — Run database setup (one time only)
+- At the bottom of the Glitch screen, click **Terminal**.
+- Type this and press Enter:
+  ```
+  npm run db:push
+  ```
+- You should see: `Changes applied ✓`
+
+### Step 6 — Get your live URL
+- Click the **Share** button (top left) → copy the Live Site URL.
+- It looks like: `https://ai-research-agent.glitch.me`
+- Paste it into your WordPress iframe embed code.
+
+### Important Glitch notes
+- The app sleeps after **5 minutes** of no visitors. The next visitor wakes it in ~20 seconds.
+- First launch takes **1–2 minutes** while the auto-build runs. After that, it's instant.
+- If you change any code, click the **Refresh** button in Glitch terminal to rebuild.
+
+---
+
+## OPTION 2 — Adaptable.io (Free, No Credit Card)
+
+1. Go to **adaptable.io** → sign up with your GitHub account.
+2. Click **New App** → **Connect to GitHub** → select `Fiaz26/ai-research-agent`.
+3. Choose **Node.js** as the app type.
+4. Set:
    - **Build command:** `npm install && npm run build`
    - **Start command:** `npm run start`
-   - **Plan:** Free
-5. Under **Environment Variables**, add:
-   | Key | Value |
-   |-----|-------|
-   | `DATABASE_URL` | Your Neon connection string |
-   | `GEMINI_API_KEY` | Your Gemini API key |
-   | `SESSION_SECRET` | Any long random string |
-   | `NODE_ENV` | `production` |
-6. Click **Create Web Service**. Render builds and deploys automatically.
-7. Your URL will be: `https://ai-research-agent.onrender.com`
-
-> **Note:** Free Render services sleep after 15 minutes of inactivity. The first visitor after a sleep waits ~30 seconds for the app to wake up. This is normal for the free tier.
+5. Add environment variables:
+   - `DATABASE_URL` → your Neon connection string
+   - `GEMINI_API_KEY` → your Gemini key
+   - `SESSION_SECRET` → any long random string
+   - `NODE_ENV` → `production`
+6. Click **Deploy**. Your URL appears in the dashboard.
 
 ---
 
-## Option B — Railway.app ($5 free credit/month, no sleep)
+## OPTION 3 — Railway.app ($5 free credit/month, never sleeps)
 
-1. Push this project to a **GitHub** repository.
-2. Go to [railway.app](https://railway.app) and sign up.
-3. Click **New Project → Deploy from GitHub repo** and select your repo.
-4. Railway detects `railway.toml` automatically.
-5. Click **Variables** and add:
-   | Key | Value |
-   |-----|-------|
-   | `DATABASE_URL` | Your Neon connection string |
-   | `GEMINI_API_KEY` | Your Gemini API key |
-   | `SESSION_SECRET` | Any long random string |
-   | `NODE_ENV` | `production` |
-6. Click **Deploy**. Your URL appears in the Railway dashboard.
+1. Go to **railway.app** → sign up with GitHub.
+2. Click **New Project** → **Deploy from GitHub repo** → select `Fiaz26/ai-research-agent`.
+3. Railway auto-detects `railway.toml` — no settings needed.
+4. Click **Variables** tab and add:
+   - `DATABASE_URL`, `GEMINI_API_KEY`, `SESSION_SECRET`, `NODE_ENV=production`
+5. Click **Deploy**.
 
 ---
 
-## Option C — Fly.io (free allowance, no sleep)
+## OPTION 4 — Render.com (Free, Requires Card for Verification)
 
-Fly.io requires their CLI tool. Run these commands in your terminal:
-
-```bash
-# Install flyctl
-curl -L https://fly.io/install.sh | sh
-
-# Login
-fly auth login
-
-# Launch (first time only — updates fly.toml)
-fly launch
-
-# Set environment variables
-fly secrets set DATABASE_URL="your-neon-connection-string"
-fly secrets set GEMINI_API_KEY="your-gemini-key"
-fly secrets set SESSION_SECRET="your-random-string"
-fly secrets set NODE_ENV="production"
-
-# Deploy
-fly deploy
-```
+1. Go to **render.com** → sign up.
+2. Click **New + → Web Service** → connect your GitHub repo.
+3. Render auto-detects `render.yaml`. Confirm settings and click **Create Web Service**.
+4. Add environment variables in the **Environment** tab.
+5. After deploy, open the **Shell** tab and run: `npm run db:push`
 
 ---
 
-## Option D — Any VPS or shared Node.js host
+## WordPress Embed Code
 
-1. Copy `.env.example` to `.env` and fill in your values.
-2. Run:
-```bash
-npm install
-npm run build
-npm run start
-```
-3. Use a process manager like **PM2** to keep it running:
-```bash
-npm install -g pm2
-pm2 start "npm run start" --name ai-research-agent
-pm2 save
-```
-
----
-
-## Embed in WordPress after deploying
-
-Once you have your live URL, paste this into a **Custom HTML block** in WordPress:
+After deploying on any platform, paste this into a **Custom HTML block** in WordPress.
+Replace `YOUR-LIVE-URL` with your actual deployed URL:
 
 ```html
-<iframe
-  src="https://YOUR-LIVE-URL/"
-  width="100%"
-  height="1400"
-  style="border:0; border-radius:16px;"
-  loading="lazy"
-  allow="clipboard-write">
-</iframe>
+<div style="max-width:1200px; margin:0 auto;">
+  <iframe
+    src="https://YOUR-LIVE-URL/"
+    title="AI Research Agent"
+    width="100%"
+    height="1400"
+    style="border:0; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); display:block;"
+    loading="lazy"
+    allow="clipboard-write">
+  </iframe>
+</div>
 ```
-
-Replace `https://YOUR-LIVE-URL/` with the URL from your chosen host.
 
 ---
 
@@ -131,25 +140,10 @@ Replace `https://YOUR-LIVE-URL/` with the URL from your chosen host.
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string (Neon, Supabase, etc.) |
-| `GEMINI_API_KEY` | One of these | Google Gemini API key (free tier available) |
-| `OPENAI_API_KEY` | One of these | OpenAI API key |
-| `OPENAI_BASE_URL` | No | Custom API base URL (for Groq, Together, etc.) |
-| `AI_MODEL` | No | Override AI model name |
-| `SESSION_SECRET` | Yes | Random string for session security |
-| `NODE_ENV` | Yes | Set to `production` on all hosts |
+| `DATABASE_URL` | Yes | Neon.tech PostgreSQL connection string |
+| `GEMINI_API_KEY` | Yes (or use OPENAI_API_KEY) | Google Gemini free AI key |
+| `OPENAI_API_KEY` | Alternative to Gemini | OpenAI paid API key |
+| `SESSION_SECRET` | Yes | Any long random string for security |
+| `NODE_ENV` | Yes | Must be set to `production` |
+| `AI_MODEL` | No | Override model (default: gemini-2.0-flash) |
 | `PORT` | No | Server port (default: 5000) |
-
----
-
-## Database migrations
-
-After first deployment, run the database migration to create tables:
-
-```bash
-npm run db:push
-```
-
-On Render: Go to **Shell** tab in your service and run the command there.  
-On Railway: Go to **Settings → Start Command** temporarily, or use the Railway CLI.  
-On Fly: `fly ssh console -C "npm run db:push"`
